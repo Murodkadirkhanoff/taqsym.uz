@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # API Gateway
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/app.dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - task-service
+      - user-service
+    networks:
+      - taqsym-network
+    environment:
+      - GIN_MODE=release
+    restart: unless-stopped
+
+  # Task Service
+  task-service:
+    build:
+      context: .
+      dockerfile: task-service/app.dockerfile
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres
+    networks:
+      - taqsym-network
+    environment:
+      - GIN_MODE=release
+    restart: unless-stopped
+
+  # User Service
+  user-service:
+    build:
+      context: .
+      dockerfile: user-service/app.dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres
+    networks:
+      - taqsym-network
+    environment:
+      - GIN_MODE=release
+    restart: unless-stopped
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_MULTIPLE_DATABASES: taskdb,userdb
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
+    networks:
+      - taqsym-network
+    restart: unless-stopped
+
+networks:
+  taqsym-network:
+    driver: bridge
+
+volumes:
+  postgres-data:

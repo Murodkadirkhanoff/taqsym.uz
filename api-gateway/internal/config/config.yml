@@ -1,0 +1,14 @@
+server:
+  port: 8080
+  timeout: 10s
+
+services:
+  user-service:
+    url: http://user-service:8081
+    timeout: 5s
+  task-service:
+    url: http://task-service:8082
+    timeout: 5s
+
+logging:
+  level: info
