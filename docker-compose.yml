@@ -1,71 +1,56 @@
-version: '3.8'
+version: '3.9'
 
 services:
-  # API Gateway
-  api-gateway:
-    build:
-      context: .
-      dockerfile: api-gateway/app.dockerfile
-    ports:
-      - "8080:8080"
-    depends_on:
-      - task-service
-      - user-service
-    networks:
-      - taqsym-network
+  postgres:
+    image: postgres:15
     environment:
-      - GIN_MODE=release
-    restart: unless-stopped
-
-  # Task Service
-  task-service:
-    build:
-      context: .
-      dockerfile: task-service/app.dockerfile
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: userdb
     ports:
-      - "8082:8082"
-    depends_on:
-      - postgres
-    networks:
-      - taqsym-network
-    environment:
-      - GIN_MODE=release
-    restart: unless-stopped
+      - '5432:5432'
+    volumes:
+      - pg_data:/var/lib/postgresql/data
 
-  # User Service
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+
+  redis:
+    image: redis:latest
+    ports:
+      - '6379:6379'
+
+  minio:
+    image: minio/minio
+    command: server /data
+    environment:
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+    ports:
+      - '9000:9000'
+    volumes:
+      - minio_data:/data
+
+  elasticsearch:
+    image: elasticsearch:8.12.0
+    environment:
+      discovery.type: single-node
+    ports:
+      - '9200:9200'
+
   user-service:
     build:
       context: .
-      dockerfile: user-service/app.dockerfile
-    ports:
-      - "8081:8081"
+      dockerfile: cmd/user-service/Dockerfile
     depends_on:
       - postgres
-    networks:
-      - taqsym-network
-    environment:
-      - GIN_MODE=release
-    restart: unless-stopped
-
-  # PostgreSQL Database
-  postgres:
-    image: postgres:15-alpine
+      - rabbitmq
     ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_MULTIPLE_DATABASES: taskdb,userdb
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-      - ./init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
-    networks:
-      - taqsym-network
-    restart: unless-stopped
-
-networks:
-  taqsym-network:
-    driver: bridge
+      - "8081:8081"
 
 volumes:
-  postgres-data:
+  pg_data:
+  minio_data:
