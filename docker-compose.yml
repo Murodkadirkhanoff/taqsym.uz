@@ -2,16 +2,24 @@ version: '3.9'
 
 services:
   postgres:
-    image: postgres:15
+    image: postgres:latest
     environment:
+      POSTGRES_DB: users_db
       POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
-      POSTGRES_DB: userdb
+      POSTGRES_PASSWORD: password
     ports:
       - '5432:5432'
     volumes:
-      - pg_data:/var/lib/postgresql/data
+          - postgres_data:/var/lib/postgresql/data
 
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
   rabbitmq:
     image: rabbitmq:3-management
     ports:
@@ -44,13 +52,27 @@ services:
   user-service:
     build:
       context: .
-      dockerfile: cmd/user-service/Dockerfile
+      dockerfile: user-service/cmd/Dockerfile
     depends_on:
       - postgres
       - rabbitmq
     ports:
       - "8081:8081"
+    environment:
+      DATABASE_DSN: ${USER_SERVISE_DATABASE_DSN}
+  migrate:
+    image: migrate/migrate
+    depends_on:
+      - postgres
+    volumes:
+      - ./user-service/migrations:/migrations
+    command: [
+      "-path", "/migrations",
+      "-database", "postgres://user:password@postgres:5432/users_db?sslmode=disable",
+      "up"
+    ]
+    restart: on-failure
 
 volumes:
-  pg_data:
+  postgres_data:
   minio_data:

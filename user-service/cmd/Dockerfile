@@ -14,9 +14,9 @@ RUN go mod download
 
 # Копируем весь проект
 COPY . .
-
+RUN go mod tidy
 # Сборка бинарного файла
-RUN go build -o bin/user-service ./cmd/user-service
+RUN go build -o bin/user-service ./user-service/cmd
 
 # 2. Этап исполнения
 FROM alpine:latest
