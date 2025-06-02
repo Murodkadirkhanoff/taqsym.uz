@@ -50,6 +50,8 @@ services:
       - rabbitmq
     ports:
       - "8081:8081"
+    environment:
+      DATABASE_DSN: ${USER_SERVISE_DATABASE_DSN}
 
 volumes:
   pg_data:
