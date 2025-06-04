@@ -1,0 +1,6 @@
+Database:
+  Host: "localhost"
+  Port: 5433
+  User: "user"
+  Password: "password"
+  DB: "user_db"

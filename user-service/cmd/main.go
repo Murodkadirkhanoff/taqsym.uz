@@ -1,7 +1,7 @@
 package main
 
 import (
-	"database/sql"
+	"fmt"
 	"log"
 	"os"
 
@@ -9,24 +9,25 @@ import (
 	"github.com/Murodkadirkhanoff/taqsym.uz/user-service/internal/repository"
 	"github.com/Murodkadirkhanoff/taqsym.uz/user-service/internal/router"
 	"github.com/Murodkadirkhanoff/taqsym.uz/user-service/internal/usecase"
+	"github.com/Murodkadirkhanoff/taqsym.uz/user-service/pkg/db"
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	db, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	database, err := db.NewPostgres()
 	if err != nil {
-		log.Fatal("failed to connect db:", err)
+		log.Fatalf("Ошибка подключения к базе: %v", err)
 	}
+	defer database.Close()
+	log.Println("Успешное подключение к базе данных!")
 
-	repo := repository.NewUserRepo(db)
+	repo := repository.NewUserRepo(database)
 	uc := usecase.NewUserUseCase(repo)
 	h := handler.NewUserHandler(uc)
 
 	r := router.SetupRouter(h)
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8081"
-	}
+	port := os.Getenv("USER_SERVICE_APP_PORT")
+	fmt.Println(port)
 	r.Run(":" + port)
 }

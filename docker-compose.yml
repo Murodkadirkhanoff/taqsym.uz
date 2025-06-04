@@ -1,16 +1,14 @@
-version: '3.9'
-
 services:
   postgres:
-    image: postgres:latest
-    environment:
-      POSTGRES_DB: users_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-    ports:
-      - '5432:5432'
-    volumes:
-          - postgres_data:/var/lib/postgresql/data
+      image: postgres:latest
+      environment:
+        POSTGRES_DB: postgres
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: password
+      ports:
+        - '5433:5432'
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
 
   pgadmin:
     image: dpage/pgadmin4
@@ -57,9 +55,7 @@ services:
       - postgres
       - rabbitmq
     ports:
-      - "8081:8081"
-    environment:
-      DATABASE_DSN: ${USER_SERVISE_DATABASE_DSN}
+      - "${USER_SERVICE_APP_PORT}:${USER_SERVICE_APP_PORT}"
   migrate:
     image: migrate/migrate
     depends_on:
