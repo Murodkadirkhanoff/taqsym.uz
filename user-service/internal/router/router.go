@@ -7,9 +7,11 @@ import (
 
 func SetupRouter(h *handler.UserHandler) *gin.Engine {
 	r := gin.Default()
+	// authRoutes := r.Group("/", middleware.AuthMiddleware())
 
-	r.POST("/register", h.Register)
-	r.POST("/login", h.Login)
+	// r.POST("/register", h.Register)
+	// r.POST("/login", h.Login)
 
+	// authRoutes.GET("/profile", h.Profile)
 	return r
 }

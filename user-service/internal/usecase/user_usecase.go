@@ -16,14 +16,14 @@ func NewUserUseCase(repo domain.UserRepository) domain.UserUseCase {
 	return &userUC{repo: repo}
 }
 
-func (uc *userUC) Register(ctx context.Context, u *domain.User) error {
-	hashed, err := utils.HashPassword(u.Password)
-	if err != nil {
-		return err
-	}
-	u.Password = hashed
-	return uc.repo.Create(ctx, u)
-}
+// func (uc *userUC) Register(ctx context.Context, u *domain.User) error {
+// 	hashed, err := utils.HashPassword(u.Password)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	u.Password = hashed
+// 	return uc.repo.Create(ctx, u)
+// }
 
 func (uc *userUC) Login(ctx context.Context, email, password string) (string, error) {
 	u, err := uc.repo.GetByEmail(ctx, email)
@@ -37,3 +37,8 @@ func (uc *userUC) Login(ctx context.Context, email, password string) (string, er
 
 	return utils.GenerateToken(u.ID, u.Email)
 }
+
+// func (uc *userUC) Profile(ctx context.Context, userID int) (domain.User, error) {
+// 	user, err := uc.repo.Profile(ctx, userID)
+// 	return user, err
+// }

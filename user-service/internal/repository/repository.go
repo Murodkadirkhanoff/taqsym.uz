@@ -33,3 +33,16 @@ func (r *userRepo) GetByEmail(ctx context.Context, email string) (*domain.User, 
 	}
 	return &u, nil
 }
+
+func (r *userRepo) Profile(ctx context.Context, userID int) (*domain.User, error) {
+	row := r.db.QueryRowContext(ctx, "SELECT id, name, email FROM users WHERE id =$1", userID)
+
+	var user domain.User
+	err := row.Scan(&user.ID, &user.Name, &user.Email)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
