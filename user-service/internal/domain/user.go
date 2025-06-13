@@ -18,7 +18,7 @@ type UserRepository interface {
 }
 
 type UserUseCase interface {
-	// Register(ctx context.Context, user *User) error
+	Register(ctx context.Context, user *User) error
 	Login(ctx context.Context, email, password string) (string, error)
-	// Profile(ctx context.Context, userID int) (*User, error)
+	Profile(ctx context.Context, userID int) (*User, error)
 }

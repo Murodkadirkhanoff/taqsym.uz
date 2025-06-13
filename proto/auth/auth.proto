@@ -1,0 +1,43 @@
+// protoc --go_out=paths=source_relative:. --go-grpc_out=paths=source_relative:. proto/auth/auth.proto
+syntax = "proto3";
+
+package auth;
+
+option go_package = "github.com/Murodkadirkhanoff/taqsym.uz/proto/auth;authpb";
+
+service AuthService {
+  rpc Login (LoginRequest) returns (LoginResponse);
+  rpc Register (RegisterRequest) returns (RegisterResponse);
+  rpc Profile (ProfileRequest) returns (ProfileResponse);
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+}
+
+message RegisterRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message RegisterResponse {
+  int64 id = 1;
+  string message = 2;
+}
+
+message ProfileRequest {
+  int64 id = 1; // user ID
+}
+
+message ProfileResponse {
+  int64 id = 1;
+  string name = 2;
+  string email = 3;
+}
+

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -9,6 +10,7 @@ import (
 var secret = []byte("supersecret")
 
 func GenerateToken(userID int64, email string) (string, error) {
+	fmt.Println(userID)
 	claims := jwt.MapClaims{
 		"user_id": userID,
 		"email":   email,

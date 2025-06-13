@@ -3,17 +3,18 @@ package grpc_clients
 import (
 	"log"
 
-	pb "github.com/Murodkadirkhanoff/taqsym.uz/api-gateway/proto/generated/pb"
+	authpb "github.com/Murodkadirkhanoff/taqsym.uz/proto/auth"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
-var AuthClient pb.AuthServiceClient
+var AuthClient authpb.AuthServiceClient
 
 func InitAuthClient() {
-	conn, err := grpc.Dial("auth-service:50051", grpc.WithInsecure())
+	conn, err := grpc.NewClient("user-service:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("не удалось подключиться к auth-service: %v", err)
 	}
-	AuthClient = pb.NewAuthServiceClient(conn)
+	AuthClient = authpb.NewAuthServiceClient(conn)
 }

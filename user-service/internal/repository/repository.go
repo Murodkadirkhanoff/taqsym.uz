@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/Murodkadirkhanoff/taqsym.uz/user-service/internal/domain"
 )
@@ -16,13 +17,14 @@ func NewUserRepo(db *sql.DB) domain.UserRepository {
 }
 
 func (r *userRepo) Create(ctx context.Context, u *domain.User) error {
-	_, err := r.db.ExecContext(ctx,
-		"INSERT INTO users (name, email, password) VALUES ($1, $2, $3)",
-		u.Name, u.Email, u.Password)
+	err := r.db.QueryRowContext(ctx,
+		"INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING ID",
+		u.Name, u.Email, u.Password).Scan(&u.ID)
 	return err
 }
 
 func (r *userRepo) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
+	fmt.Println(email)
 	row := r.db.QueryRowContext(ctx,
 		"SELECT id, name, email, password FROM users WHERE email=$1", email)
 

@@ -12,6 +12,19 @@ services:
         - postgres_data:/var/lib/postgresql/data
       networks:
       - users-network
+  task-db:
+      image: postgres:latest
+      container_name: task-db
+      environment:
+        POSTGRES_DB: postgres
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: password
+      ports:
+        - '5434:5432'
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      networks:
+      - users-network
   pgadmin:
     image: dpage/pgadmin4
     restart: unless-stopped
@@ -64,6 +77,19 @@ services:
       - rabbitmq
     networks:
       - users-network
+    ports:
+      - "50051:50051"
+  task-service:
+    build:
+      context: .
+      dockerfile: task-service/cmd/Dockerfile
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - users-network
+    ports:
+      - "50052:50051"
   api-gateway:
     build:
       context: .
