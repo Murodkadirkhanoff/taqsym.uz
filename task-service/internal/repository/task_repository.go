@@ -17,8 +17,8 @@ func NewTaskRepository(db *sql.DB) domain.Repository {
 
 func (r *TaskRepository) Create(ctx context.Context, task *domain.Task) error {
 	err := r.db.QueryRowContext(ctx,
-		"INSERT INTO tasks (title, description, user_id) VALUES ($1, $2, $3) RETURNING ID",
-		task.Title, task.Description, task.UserID).Scan(task.ID)
+		"INSERT INTO tasks (title, description, user_id) VALUES ($1, $2, $3) RETURNING id",
+		task.Title, task.Description, task.UserID).Scan(&task.ID)
 	return err
 }
 

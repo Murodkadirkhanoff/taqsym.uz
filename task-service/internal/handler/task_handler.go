@@ -13,6 +13,10 @@ type TaskHandler struct {
 	uc domain.Usecase
 }
 
+func NewTaskHandler(uc domain.Usecase) *TaskHandler {
+	return &TaskHandler{uc: uc}
+}
+
 func (h *TaskHandler) Create(ctx context.Context, request *taskpb.CreateTaskRequest) (*taskpb.CreateTaskResponse, error) {
 	task := domain.Task{
 		Title:       request.GetTitle(),
@@ -32,7 +36,7 @@ func (h *TaskHandler) Create(ctx context.Context, request *taskpb.CreateTaskRequ
 	}, nil
 }
 
-func (h *TaskHandler) List(ctx context.Context, request *taskpb.ListTasksRequest) (*taskpb.ListTasksResponse, error) {
+func (h *TaskHandler) ListTasks(ctx context.Context, request *taskpb.ListTasksRequest) (*taskpb.ListTasksResponse, error) {
 	tasks, err := h.uc.List(ctx)
 
 	protoTasks := []*taskpb.Task{}

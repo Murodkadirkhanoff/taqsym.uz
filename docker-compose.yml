@@ -22,7 +22,7 @@ services:
       ports:
         - '5434:5432'
       volumes:
-        - postgres_data:/var/lib/postgresql/data
+        - task_db_data:/var/lib/postgresql/data
       networks:
       - users-network
   pgadmin:
@@ -84,7 +84,7 @@ services:
       context: .
       dockerfile: task-service/cmd/Dockerfile
     depends_on:
-      - postgres
+      - task-db
       - rabbitmq
     networks:
       - users-network
@@ -115,8 +115,24 @@ services:
     restart: on-failure
     networks:
       - users-network
+
+  task-migrate:
+    image: migrate/migrate
+    depends_on:
+      - task-db
+    volumes:
+      - ./task-service/migrations:/migrations
+    command: [
+      "-path", "/migrations",
+      "-database", "postgres://postgres:password@task-db:5432/postgres?sslmode=disable",
+      "up"
+    ]
+    restart: on-failure
+    networks:
+      - users-network
 volumes:
   postgres_data:
+  task_db_data:
   minio_data:
 
 networks:

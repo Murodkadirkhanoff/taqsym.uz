@@ -12,9 +12,12 @@ func main() {
 	authRoutes := r.Group("/", middleware.AuthMiddleware())
 
 	grpc_clients.InitAuthClient()
+	grpc_clients.InitTaskClient()
 
 	r.POST("/login", routes.LoginHandler)
 	r.POST("/register", routes.RegisterHandler)
+	r.GET("/tasks", routes.TasksListHandler)
+	r.POST("tasks", routes.CreateTask)
 
 	authRoutes.GET("/profile", routes.ProfileHandler)
 
